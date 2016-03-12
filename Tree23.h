@@ -1,8 +1,6 @@
 /* 
  * File:   Tree23.h
- * Author: marekcerny
- *
- * Created on 15. února 2016, 14:22
+ * Author: MarekCerny.com
  */
 
 #include <cassert>
