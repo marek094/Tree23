@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+        <title>Programátorská dokumentace ke knihovně Tree23.h</title>
+        <style>
+            footer {font-size:80%; border-top: 1px solid #ccc;}
+            body {text-align: center;}
+            footer, section, header {
+                max-width:800px; 
+                margin: auto;
+                text-align: left;
+            }
+            p.desc {font-style: italic;}
+            h2, h3 {border-bottom: 1px solid #ccc;}
+            pre, code, var, dl.code dt, dl.var dt 
+                {color: green; font-family: monospace;}
+            var, dl.var dt {font-weight: bold; font-style: normal;}
+            code i, pre i {font-family: serif; font-size: 90%;}
+            pre.console {color: white; background: black; padding: 3px;}
+            samp {color: white; background: black; font-family: monospace;}
+            dt {line-height: 1.7;}
+            .alg var, .alg code {color: black !important;}
+            .alg u {display:inline-block; padding-left: 6ex}
+       </style>
+    </head>
+    <body>
+        <header>
+            <h1>Tree23.h - programátorská dokumentace</h1>
+            <h3>Popis</h3>
+            <p>
+                Knihovna <b>Tree23.h</b> obsahuje šablonu třídy 
+                <code>template &lt;class T&gt; class Tree23</code>.
+                Implementuje datovou strukturu <i> uspořádaná množina</i>,
+                podobně jako <code>std::set</code>, přímočaře skrze 
+                <i>(2,3)-stromy</i>.
+            </p>
+            <p>
+                Snaha o podobnost (aspoň interface) s ostatními standardními 
+                containery jazyka. Přesto chybí <i>iterátor</i> a zvláštní 
+                (zatím i pro mě :)) <i>alokátor</i> (proto 
+                <code>Tree23::find()</code> prozatím navrací logickou hodnotu).
+            </p>
+            <p>
+                Do budoucna plánuji rozšířit na <i>(&alpha;,&beta;)-stromy</i>
+                po stránce algoritmické a implemementovat (viz výše) další 
+                standardní funkce <i>STL</i> containerů.</p>
+            <h5>Standard</h5>   
+            <p>
+                Knihovně postačí <i>c++98</i>, do budoucna plánuji více použít a 
+                implementovat elegance <i>c++11</i>.
+            </p>
+            <h3>Obsah adresáře</h3>
+            <ul>
+                <li><b>Tree23.h</b> [<a href="Tree23.h">file</a>, <a href="#Tree23_h">doc</a>] - hlavička knihovny
+                <li><b>inpgen.cpp</b> [<a href="inpgen.cpp">file</a>, <a href="#inpgen_cpp">doc</a>] - generátor vstupů, testování korektnosti a výkonu.
+                <li><b>main.cpp</b> [<a href="main.cpp">file</a>, <a href="#main_cpp">doc</a>] - demo</li>
+            </ul>
+            <ul style='font-size:80%'>
+                <li><b>doc.html</b> [<a href="doc.html">file</a>] - uživatelská dokumentace, navíc patří
+                    do programátorské
+                <li><b>doc_dev.html</b> [<a href="doc_dev.html">file</a>] - právě čtete
+                <li><b>2-3-trees.pdf</b> [<a href="2-3-trees.pdf">file</a>]- paper, dle něhož bylo implementěno
+            </ul>
+        </header>
+        <section>
+            <h2 id="Tree23_h">Tree23.h</h2>
+            <p>
+                Knihovna obsahuje jednu třídu celé struktury <code>template 
+                &lt;class T&gt; class Tree23;</code> a jednu vnořenou privátní
+                třídu pro vrcholy stromu <code>class Node;</code>.
+            </p>
+            <h4>Debug mode</h4>
+            <p>
+                Knihovna má speciální <i>debug mode</i> s výpisy.
+                Zapíná se makrem <var>TREE23_DEBUG</var>. Jeho použití 
+                <strong>zhorší časovou složitost</strong> na <i>O(NlogN)</i>
+                pro základní operace.
+            </p>
+            <h5>Experimental mode</h5>
+            <p>
+                V tomto módu umí knihovna nějaká neověřená vylepšení. 
+                Nyní jím je jednoduchý <i>buffer allocator</i>, 
+                který zachraňuje posledních <code><var>PEG_SIZE</var> = 8192</code>
+                pointerů před dealokací a v případě potřeby je recykluje.
+                To může představovat v průměrných datech (závislých na 
+                prozatím zatím statické velikosti bufferu) 
+                zrychlení i o desítky procent, ale přidá overhead 
+                pro malé vstupy. 
+                Zapíná se makrem <var>TREE23_EXPERIMENTAL</var>. 
+            </p>
+            <p>
+                Protože tento koncept není ještě zcela univerzální, nepovažuji 
+                ho za součást práce a nebudu se jím proto v dokumentaci
+                dále zabývat.
+            </p>
+            <h4>Class Tree23</h4>
+            <p>
+                Třída obsahuje všechny potřebné funkce pro práci s daty. 
+                Speciálně obsahuje několik debugovacích funkcí pro výpis
+                a několik
+                pomocných funkcí. Ostatní jsou v <a href="doc.html">
+                uživatelké referenci</a> (většina z nich se chová tak přímočaře,
+                jak by se dalo čekat nebo na první pohled zjistit, že se 
+                jimi dokumentace dále nezabývá). 
+            </p>
+            <p>
+                Obsahuje globální proměnné <code>Node *<var>root</var></code> 
+                a <code>unsigned <var>_size</var></code>.
+            </p>
+            <h5>Funkce pro výpis</h5>
+            <dl class="code">
+                <dt>DBG_OUT(<i>string</i>) 
+                <dd>makro používající standardní výstup (<strong>musí</strong>  
+                    být definován
+                    pro prvky typu šablony <code>T</code>)
+                <dt>void __print(Node *p)
+                <dd>vypíše uspořádaně klíče uložené v podstromu <var>*p</var>
+                <dt>void dbg(Node *p)
+                <dd>vypíše klíče vrcholu např. <samp>(20 44)</samp>.
+                <dt>void __dbg_bfs(Node *p)
+                <dd>vypíše vrcholy podstromu <var>*p</var> po hladinách
+                <dt>inline void dbg_bfs()
+                <dd>totéž, ale <code>p = root</code>
+            </dl>
+            <h5>Pomocné funkce</h5>
+            <dl class="code">
+                <dt>inline void __constructor()
+                <dd>inicializuje proměnné třídy
+                <dt>void __destructor(Node **p)
+                <dd>rekurzivně uvolní paměť obsazenou vrcholy a v nich
+                    uloženými klíči.
+                <dt>Node *findPtr(const T &val)
+                <dd>totožná s funkcí <code>bool find(const T &val)</code> jen 
+                    vrací ukazatel na vrchol, <var>NULL</var> v případě 
+                    neúspěchu.
+                <dt>Node *findSmallerPtr(const T &val)
+                <dd>jako výše, jen v případě neúspěchu vrací ukazatel na
+                    poslední vrchol.
+                <dt>inline void compare(T **a, T **b)
+                <dd>porovná prvky a pokud jsou v sestupném pořadí, vymění 
+                    jejich ukazatele.
+            </dl>
+            <h4>Class Node</h4>
+            <h5>Proměnné třídy</h5>
+            <pre> 
+    unsigned size;
+    T *key[2];
+    Node *child[3], *parent;
+            </pre>
+            <h5>Členské funkce</h5>
+            <dl class="code">
+                <dt>Node(); Node(T *key)
+                <dd>konstruktor a konstruktor s jedním klíčem
+                <dt>inline void addChild(int order, Node *p)
+                <dd>přidá vrcholu <var>order</var>-tého potomka <var>*p</var>
+                <dt>inline void pushLeft(T *_key, Node *_child) 
+                <dt>inline void pushRight(T *_key, Node *_child)
+                <dd>posune klíče a potomky o jedna v poli a na tyto 
+                    volné pozice přidá argumenty. Zvětší velikost vrcholu o 
+                    jedna.
+                <dt>inline void popLeft()
+                <dt>inline void popRight() 
+                <dd>smaže z levého/pravého konce pole klíč a potomka, zmenší 
+                    velikost o jedna
+            </dl>
+            <h3>Algoritmická část</h3>
+            <p>
+                Při implementování jsem kódoval operace v pořádí 
+                a rozdělení na fáze podle (náhodně zvoleného)
+                <a href="2-3-trees.pdf">2-3-trees.pdf</a>. Zvláště pak
+                obrázky <i>terminal cases</i> odpovídají.
+            </p>
+            <h4>Terminal cases</h4>
+            <p>
+                Všechny operace sloučení/rozdělění vrcholů popisuji pomocí dvou 
+                menších - 
+                <code>void pushLeft(<i>klíč</i>, <i>potomek</i>);</code>, 
+                <code>void popLeft();</code> a jejich pravostranných alternativ. 
+                Pro přiřazení potomka pak navíc <code>void addChild(<i>pořadí</i>,
+                <i>potomek</i>);</code>, která se stará o aktualizaci 
+                ukazatele na rodiče v potomku.
+            </p>
+            <p>Nejprve ke značení:</p>
+            <ul>
+                <li><code>"3a<-"</code>: odrážka číslo <b>3</b>,
+                    případ <b>a</b>, <b>pravá</b> čast v 
+                    <a href="2-3-trees.pdf">popisu</a> operace delete. 
+                <li><code><i>vrchol[</i>(<i>[klíč 0[</i>,<i>klíč
+                    1]]</i>)<i>]</i></code> označuje vrchol s 
+                    libovolnými, žádným, jedním nebo dvěma klíči.       
+                <li><code>act</code> je značka proměnné     <var>act</var>, 
+                    podobně <code>par</code>. 
+                    <ul>
+                        <li>proměnná <var>act</var> označuje vrchol, 
+                            se kterým se právě pracuje (příčina úprav). 
+                        <li><var>par</var> je vždy otcem <var>act</var>. 
+                    </ul>
+                <li><code>C<i>x</i></code>  odpovídá <var>c[<i>x</i>]</var>
+                    a platí <code>c == par->child</code>
+            </ul>            
+            <p>Příklad:<p>
+            <pre>
+    DBG_OUT("3a<-\n");
+    //          |                  |
+    //     par(k0,k1)            par(k1)
+    //     /    |    \   --->    /    \
+    //  C0(l0) act() C2      C0(l0,k0) C2
+    //   /  \   |             / | \
+    //  D0  D1  E0          D0 D1 E0 
+
+    c[0]->pushRight(par->key[0], act->child[0]);
+    par->addChild(1, c[0]);
+    par->popLeft();
+    delete act;</pre>
+            <p>
+                Někdy si vystačíme s dvěma operacemi. V této ukázce 
+                je potřeba navíc přesunout potomka <code>C0</code> o jednu 
+                pozici doprava. 
+            </p>
+            
+        </section>
+        <section>
+            <h2 id="inpgen_cpp">inpgen.cpp</h2>
+            <h4>Použití</h4>
+            <p>
+                Celý program se dělí na několik částí - generátor vstupů,
+                funkce testující vstup na <i>std::set</i>, funkce testující 
+                tentýž vstup na <i>Tree23</i> a funkce porovnávající výstupy 
+                obou programů. V proceduře <i>main</i> navíc měříme čas strávený 
+                jednotlivými funkcemi.
+            </p>            
+            <p>Výpis nápovědy:</p>
+            <pre>
+Arguments expected:
+   inpgen PATTERN #PATTERNS #TESTS [MIN_SIZE]
+   PATTERN: string of {F,I,E} (find, insert, erase)
+   	example: 'IFFEF' - for each: insert value,
+   	find it twice, erase and check it.
+   #PATTERNS: number of values inserted by pattern
+   #TESTS: number of tests
+   MIN_SIZE: number of inserts before the first erase                
+            </pre>
+            <p>Příklad volání:</p>
+            <pre class='console'>
+$ clang++ -std=c++11 -o inpgen inpgen.cpp && ./inpgen IFFEFIFFEF 30000 100
+     -- tests OK --                      
+Total time	tree: 13.875s, set: 15.264s
+Size		average: 16366, max: 23633
+Result		Tree23/set::set: 90.9002%
+            </pre>
+            <h4>Generátor vstupů</h4>
+            <p>Algoritmus zajišťuje, že pro <code>i</code>-tou hodnotu
+                zavolá postupně všechny operace z <var>PATTERN</var>, avšak 
+                náhodně rozmístěné mezi ostatními operacemi.
+            </p>
+            <p>
+                Pokud je navíc zadán parametr <var>MIN_SIZE</var> (< 
+                <var>#PATERNS</var>),
+                pak je navíc splně na podmínka, že dokud nebude zavoláno
+                <var>MIN_SIZE</var> operací <i>I - insert</i>, nebude zavolána
+                <i>E - erase</i>.
+                
+            </p>
+            <!--<p>Algoritmus:</p>
+            <ol class="alg">
+                <li>Pro <code>i := 1..<var>#PATTERNS</var></code>
+                <li><u></u>Každému znaku <code>c</code> z <var>PATTERN</var>
+                přiřaď náhodné číslo p
+                <li><u></u><code>po := </code>[neklesající 
+                    posloupnost délky <var>|PATTERN|</var> náhodných čísel]
+                    <li><u></u> 
+            </ol>-->
+            
+        </section>
+        <footer><p>Děkuji za dočtení.</p></footer>
+    </body>  
+</html>
+        

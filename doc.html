@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Interface documentation Tree23.h lib</title>
+        <style>
+            footer {font-size:80%; border-top: 1px solid #ccc;}
+            body {text-align: center;}
+            footer, section, header {
+                width:800px; 
+                margin: auto;
+                text-align: left;
+            }
+            p.desc {font-style: italic;}
+            h2, h3 {border-bottom: 1px solid #ccc;}
+            pre, code, var, dl.code dt, dl.var dt 
+                {color: green; font-family: monospace;}
+            var, dl.var dt {font-weight: bold; font-style: normal;}
+            code i, pre i {font-family: serif; font-size: 90%;}
+            pre.console {color: white; background: black; padding: 3px;}
+            samp {color: white; background: black; font-family: monospace;}
+            dt {line-height: 1.7;}
+       </style>
+    </head>
+    <body>
+        <header>
+            <h1>Tree23.h - c++ library</h1>
+            <pre>template &lt;class T&gt; class Tree23;</pre>
+            <p>Tree23 is a class implementing ordered set as <a href="http://en.wikipedia.org/wiki/2–3_tree"> (2,3)-tree</a>.</p>
+            <p>This library requeres c++98 standard.</p>
+            <h2>Interface reference</h2>
+            <h3>Member functions</h3>
+            <ul>
+                <li><a href="#constructor">(constructor)</a></li>
+                <li><a href="#destructor">(destructor)</a></li>
+                <li><a href="#insert">insert</a></li>
+                <li><a href="#find">find</a></li>    
+                <li><a href="#erase">erase</a></li>
+                <li><a href="#size">size</a></li>
+                <li><a href="#clear">clear</a></li>
+                <li><a href="#empty">empty</a></li>
+            </ul>
+        </header>
+        <section>
+            <h2>Demo</h2>
+            <pre>
+#include &lt;iostream&gt;
+#include "Tree23.h"
+
+int main() {
+    float inp[5] = {50.5, 10.7, 30.2, 20.2, 40.4}; 
+    float fnd[5] = {50.5, 30.2, 40.4, 3.14, 2.72};
+	
+    Tree23&lt;float&gt; tr;
+
+	for (int i=0; i&lt;5; i++) {
+		tr.insert(inp[i]);
+		std::cout &lt;&lt; inp[i] &lt;&lt; " inserted";
+        	std::cout &lt;&lt;" (size: " &lt;&lt; tr.size() &lt;&lt; ") " &lt;&lt; std::endl;
+	}
+	
+	for (int i=0; i&lt;5; i++) {
+		if (tr.find(fnd[i])) {
+			std::cout &lt;&lt; fnd[i] &lt;&lt; " found" &lt;&lt; std::endl;
+		} else {
+			std::cout &lt;&lt; fnd[i] &lt;&lt; " not found" &lt;&lt; std::endl;
+		}
+	}
+	
+	for (int i=0; i&lt;5; i++) {
+		tr.erase(fnd[i]);
+		std::cout &lt;&lt; inp[i] &lt;&lt; " erased";		
+		std::cout &lt;&lt;" (size: " &lt;&lt; tr.size() &lt;&lt; ") " &lt;&lt; std::endl;
+	}
+	
+	tr.clear();
+	
+	if (tr.empty()) {
+		std::cout &lt;&lt; "set  clear";
+		std::cout &lt;&lt; " (size: " &lt;&lt; tr.size() &lt;&lt; ") " &lt;&lt; std::endl;				
+	}
+	
+    return 0;					   
+            </pre>
+            <h4>Output:</h4>
+            <pre class="console">
+50.5 inserted (size: 1) 
+10.7 inserted (size: 2) 
+30.2 inserted (size: 3) 
+20.2 inserted (size: 4) 
+40.4 inserted (size: 5) 
+50.5 found
+30.2 found
+40.4 found
+3.14 not found
+2.72 not found
+50.5 erased (size: 4) 
+10.7 erased (size: 3) 
+30.2 erased (size: 2) 
+20.2 erased (size: 2) 
+40.4 erased (size: 2) 
+set  clear (size: 0) 
+            </pre>
+        </section>
+        <section id="constructor">
+            <h3><i>constructor</i></h3>
+            <pre>Tree23::Tree23();</pre>
+            <p class="desc">Inicialize set structure.</p>
+            <p>Time complexity is <b>constant</b>.</p>
+        </section> 
+        <section id="destructor">
+            <h3><i>destructor</i></h3>
+            <pre>Tree23::~Tree23();</pre>
+            <p class="desc">Deallocate all used pointers and volues.</p>
+            <p>Time complexity is <b>linear</b> in actual size.</p>            
+        </section>        
+        <section id="insert">
+            <h3>Insert</h3>
+            <pre>void Tree23::insert(const T &amp;val);</pre>
+            <p class="desc">Insert value into the set. Value is passed by reference and will be copied into class.</p>
+            <p>Time complexity is <b>logarithmic</b> in size.</p>
+        </section>        
+        <section id="find">
+            <h3>Find</h3>
+            <pre>bool Tree23::find(const T &amp;val);</pre>
+            <p class="desc">Find out if value is in the set. Value is passed by reference.</p>
+            <p>Time complexity is <b>logarithmic</b> in size.</p>
+        </section>        
+        <section id="erase">
+            <h3>Erase</h3>
+            <pre>void Tree23::erase(const T &val);</pre>
+            <p class="desc">Delete value from the set. Value is passed by reference.</p>
+            <p>Time complexity is <b>logarithmic</b> in size.</p>
+        </section>    
+        <section id="size">
+            <h3>Size</h3>
+            <pre>inline unsigned Tree23::size();</pre>
+            <p class="desc">Returns number of values in the set.</p>
+            <p>Time complexity is <b>constant</b>.</p>
+        </section> 
+        <section id="empty">
+            <h3>Empty</h3>
+            <pre>inline bool Tree23::empty();</pre>
+            <p class="desc">Returns true if size of the set is equal to zero, false otherwise. </p>
+            <p>Time complexity is <b>constant</b>.</p>
+        </section>          
+        <section id="clear">
+            <h3>Clear</h3>
+            <pre>void Tree23::clear();</pre>
+            <p class="desc">Delete all values from set and call new contructor.</p>
+            <p>Time complexity is a time complexity equals to complexity of constructor and destructor.</p>              
+        </section>          
+        <footer>
+            <p>Seminar work of <a href="http://marekcerny.com">Marek Cerny</a>.</p>
+        </footer>
+    </body>
+</html>
